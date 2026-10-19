@@ -1,37 +1,47 @@
 name: Crear APK de Entre Paginas
+
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
+
 permissions:
   contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
+
       - name: Preparar Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-       - name: Preparar Android SDK
+
+      - name: Preparar Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: |
             platforms;android-35
-            build-tools;35.0.0: Preparar Gradle
+            build-tools;35.0.0
+
+      - name: Preparar Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
       - name: Extraer proyecto Android corregido
         run: |
           unzip -o EntrePaginasAndroid_proyecto_corregido.zip
           test -f EntrePaginasAndroid/app/build.gradle.kts
+
       - name: Compilar APK
         working-directory: EntrePaginasAndroid
         run: gradle --no-daemon assembleDebug
+
       - name: Guardar APK compilado
         uses: actions/upload-artifact@v4
         with:
